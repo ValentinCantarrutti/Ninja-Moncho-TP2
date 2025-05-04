@@ -3,8 +3,8 @@ import HelloWorldScene from "./scenes/HelloWorldScene.js";
 // Create a new Phaser config object
 const config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: 500,
+  height: 331,
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
