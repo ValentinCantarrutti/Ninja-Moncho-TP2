@@ -42,29 +42,17 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.physics.add.collider(this.square, this.platforms);
 
 
-    this.physics.add.overlap(this.player, this.triangles, () => {
-      console.log("overlap!");
-    }, null, this);
+    this.physics.add.overlap(this.player, this.triangles, this.collectriangle , null, this);
 
-    this.physics.add.collider(this.player, this.triangles, () => {
-      console.log("collided!");
-    }, null, this);
+    this.physics.add.collider(this.player, this.triangles, this.collectriangle , null, this);
 
-    this.physics.add.overlap(this.player, this.diamonds, () => {
-      console.log("overlap!");
-    }, null, this);
+    this.physics.add.overlap(this.player, this.diamonds, this.collectdiamonds , null, this);
 
-    this.physics.add.collider(this.player, this.diamonds, () => {
-      console.log("collided!");
-    }, null, this);
+    this.physics.add.collider(this.player, this.diamonds, this.collectdiamonds , null, this);
 
-    this.physics.add.overlap(this.player, this.square, () => {
-      console.log("overlap!");
-    }, null, this);
+    this.physics.add.overlap(this.player, this.square, this.collectsquare , null, this);
 
-    this.physics.add.collider(this.player, this.square, () => {
-      console.log("collided!");
-    }, null, this);
+    this.physics.add.collider(this.player, this.square, this.collectsquare , null, this);
 
     this.time.addEvent({
       delay: 4000,
@@ -85,6 +73,27 @@ export default class HelloWorldScene extends Phaser.Scene {
       callback: this.createSquare,
       callbackScope: this,
       loop: true
+    });
+
+    this.trianglesvar = 0;
+    this.diamondsvar = 0;
+    this.squaresvar = 0;
+
+    this.gameOver = false;
+
+    this.trianglestext = this.add.text(32, 32, `Triangulos: ${this.trianglesvar}`, {
+      fontSize: "32px",
+      fill: "#000",
+    });
+
+    this.diamondstext = this.add.text(32, 64, `Diamantes: ${this.diamondsvar}`, {
+      fontSize: "32px",
+      fill: "#000",
+    });
+
+    this.squarestext = this.add.text(32, 96, `Cuadrados: ${this.squaresvar}`, {
+      fontSize: "32px",
+      fill: "#000",
     });
   }
 
@@ -117,5 +126,76 @@ export default class HelloWorldScene extends Phaser.Scene {
     } else {
       this.player.setVelocityX(0);
     }
+
+    if (
+      this.trianglesvar >= 2 &&
+      this.diamondsvar >= 2 &&
+      this.squaresvar >= 2 &&
+      !this.gameOver
+    ) {
+      this.Victoria();
+    }
   }
-}
+
+  collectriangle(player, triangle) {
+    triangle.disableBody(true, true);
+
+    this.trianglesvar += 1;
+    this.trianglestext.setText(`Triangulos: ${this.trianglesvar}`);
+    }
+
+  collectdiamonds(player, diamond) {
+      diamond.disableBody(true, true);
+  
+      this.diamondsvar += 1;
+      this.diamondstext.setText(`Diamantes: ${this.diamondsvar}`);
+      }
+
+  collectsquare(player, square) {
+        square.disableBody(true, true);
+    
+        this.squaresvar += 1;
+        this.squarestext.setText(`Cuadrados: ${this.squaresvar}`);
+        }
+
+  Victoria() {
+    this.physics.pause();
+
+    this.gameOver = true;
+
+    this.victoriatexto = this.add.text(662, 512, `Victoria`, {
+      fontSize: "128px",
+      fill: "#000",
+    });
+
+    this.victoriatexto = this.add.text(684, 622, `Recolectaste 2 de cada figura.`, {
+      fontSize: "32px",
+      fill: "#000",
+    });
+
+    this.time.removeAllEvents();
+
+    this.trianglestext.visible = false;
+    this.diamondstext.visible = false;
+    this.squarestext.visible = false;
+
+    this.trianglestext = this.add.text(450, 750, `Triangulos: ${this.trianglesvar}`, {
+      fontSize: "32px",
+      fill: "#000",
+    });
+
+    this.diamondstext = this.add.text(850, 750, `Diamantes: ${this.diamondsvar}`, {
+      fontSize: "32px",
+      fill: "#000",
+    });
+
+    this.squarestext = this.add.text(1250, 750, `Cuadrados: ${this.squaresvar}`, {
+      fontSize: "32px",
+      fill: "#000",
+    });
+  }
+  }
+
+  
+
+
