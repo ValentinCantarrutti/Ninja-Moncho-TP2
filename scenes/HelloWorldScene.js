@@ -2,20 +2,14 @@
 
 export default class HelloWorldScene extends Phaser.Scene {
   constructor() {
-    // key of the scene
-    // the key will be used to start the scene by other scenes
     super("hello-world");
   }
 
   init() {
-    // this is called before the scene is created
     // init variables
-    // take data passed from other scenes
-    // data object param {}
   }
 
   preload() {
-    // load assets
     this.load.image("sky", "./public/assets/Cielo.webp");
     this.load.image("backgroundmenu", "./public/assets/FondoMenu.jpg");
     this.load.image("platform", "./public/assets/platform.png");
@@ -26,27 +20,102 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   create() {
-    // create game objects
-    this.add.image(250, 165, "sky");
+    this.sky = this.add.image(250, 165, "sky");
+    this.sky.setScale(7);
 
-    
-    const ninjavariable = this.physics.add.image(40, 10, "ninjamoncho");
-    ninjavariable.setScale(0.1);
-    ninjavariable.setVelocity(100, 200);
-    ninjavariable.setBounce(1, 1);
-    ninjavariable.setCollideWorldBounds(true);
+    this.platforms = this.physics.add.staticGroup();
+    this.platforms.create(120, 1420, "platform").setScale(12).refreshBody();
 
-    // emmit particles from logo
-  //  const emitter = this.add.particles(0, 0, "triangle", {
- //     speed: 100,
-    //  scale: { start: 1, end: 0 },
-  //    blendMode: "ADD",
-    //});
+    this.player = this.physics.add.sprite(958, 1025, "ninjamoncho");
+    this.player.setScale(0.2);
+    this.player.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player, this.platforms);
 
-    emitter.startFollow(ninjavariable);
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    this.triangles = this.physics.add.group();
+    this.diamonds = this.physics.add.group();
+    this.square = this.physics.add.group();
+
+    this.physics.add.collider(this.triangles, this.platforms);
+    this.physics.add.collider(this.diamonds, this.platforms);
+    this.physics.add.collider(this.square, this.platforms);
+
+
+    this.physics.add.overlap(this.player, this.triangles, () => {
+      console.log("overlap!");
+    }, null, this);
+
+    this.physics.add.collider(this.player, this.triangles, () => {
+      console.log("collided!");
+    }, null, this);
+
+    this.physics.add.overlap(this.player, this.diamonds, () => {
+      console.log("overlap!");
+    }, null, this);
+
+    this.physics.add.collider(this.player, this.diamonds, () => {
+      console.log("collided!");
+    }, null, this);
+
+    this.physics.add.overlap(this.player, this.square, () => {
+      console.log("overlap!");
+    }, null, this);
+
+    this.physics.add.collider(this.player, this.square, () => {
+      console.log("collided!");
+    }, null, this);
+
+    this.time.addEvent({
+      delay: 4000,
+      callback: this.createTriangle,
+      callbackScope: this,
+      loop: true
+    });
+
+    this.time.addEvent({
+      delay: 6500,
+      callback: this.createDiamonds,
+      callbackScope: this,
+      loop: true
+    });
+
+    this.time.addEvent({
+      delay: 8500,
+      callback: this.createSquare,
+      callbackScope: this,
+      loop: true
+    });
+  }
+
+  createTriangle() {
+    const x = Phaser.Math.Between(0, 2120);
+    const triangle = this.triangles.create(x, 0, "triangle");
+    triangle.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    triangle.setCollideWorldBounds(true);
+  }
+
+  createDiamonds() {
+    const xd = Phaser.Math.Between(0, 2120);
+    const diamond = this.diamonds.create(xd, 0, "diamond");
+    diamond.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    diamond.setCollideWorldBounds(true);
+  }
+
+  createSquare() {
+    const xs = Phaser.Math.Between(0, 2120);
+    const squares = this.square.create(xs, 0, "square");
+    squares.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    squares.setCollideWorldBounds(true);
   }
 
   update() {
-    // update game objects
+    if (this.cursors.left.isDown) {
+      this.player.setVelocityX(-420);
+    } else if (this.cursors.right.isDown) {
+      this.player.setVelocityX(420);
+    } else {
+      this.player.setVelocityX(0);
+    }
   }
 }
