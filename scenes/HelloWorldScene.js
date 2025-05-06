@@ -175,7 +175,13 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.player.setVelocityY(-520);
     }
 
-    if (this.puntuationvar >= 100 && !this.gameOver) {
+    if (
+      this.trianglesvar >= 2 &&
+      this.diamondsvar >= 2 &&
+      this.squaresvar >= 2 &&
+      this.puntuationvar >= 100 &&
+      !this.gameOver
+    ) {
       this.Victoria();
     }
 
@@ -240,7 +246,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       fill: "#000",
     });
 
-    this.victoriatexto = this.add.text(684, 622, `Recolectaste 2 de cada figura.`, {
+    this.victoriatexto = this.add.text(450, 622, `Recolectaste 2 de cada figura y superaste los 100 puntos.`, {
       fontSize: "32px",
       fill: "#000",
     });
