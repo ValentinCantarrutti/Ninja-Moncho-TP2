@@ -78,7 +78,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.trianglesvar = 0;
     this.diamondsvar = 0;
     this.squaresvar = 0;
-    this.puntuationvar = 200;
+    this.puntuationvar = 0;
 
     this.gameOver = false;
 
@@ -114,7 +114,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       triangle.touchCount += 1;
       if (triangle.touchCount >= 2) {
       triangle.destroy(); 
-      this.puntuationvar -= 20; 
+      this.puntuationvar -= 0; 
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);}
     });
 
@@ -122,7 +122,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       diamond.touchCount += 1;
       if (diamond.touchCount >= 2) {
       diamond.destroy(); 
-      this.puntuationvar -= 30; 
+      this.puntuationvar -= 0; 
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);}
     });
 
@@ -130,7 +130,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       square.touchCount += 1;
       if (square.touchCount >= 2) {
       square.destroy(); 
-      this.puntuationvar -= 40; 
+      this.puntuationvar -= 0; 
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);}
     });
 
@@ -175,12 +175,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.player.setVelocityY(-520);
     }
 
-    if (
-      this.trianglesvar >= 2 &&
-      this.diamondsvar >= 2 &&
-      this.squaresvar >= 2 &&
-      !this.gameOver
-    ) {
+    if (this.puntuationvar >= 100 && !this.gameOver) {
       this.Victoria();
     }
 
@@ -189,9 +184,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.timerText.setText(`Tiempo: ${remaining} `);
     }
 
-    if (this.puntuationvar <= 0 && !this.gameOver) {
-      this.Derrota(); 
-    }
+
 
     if (this.rKey.isDown) {
       this.scene.restart();
@@ -204,7 +197,10 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.timer.elapsed -= 2000;
     this.trianglesvar += 1;
+    this.puntuationvar += 10;
     this.trianglestext.setText(`Triangulos: ${this.trianglesvar}`);
+    this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
+
     }
     
 
@@ -213,7 +209,10 @@ export default class HelloWorldScene extends Phaser.Scene {
   
       this.timer.elapsed -= 2000;
       this.diamondsvar += 1;
+      this.puntuationvar += 15;
       this.diamondstext.setText(`Diamantes: ${this.diamondsvar}`);
+      this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
+
       }
 
 
@@ -223,7 +222,10 @@ export default class HelloWorldScene extends Phaser.Scene {
     
       this.timer.elapsed -= 2000;
       this.squaresvar += 1;
+      this.puntuationvar += 20;
       this.squarestext.setText(`Cuadrados: ${this.squaresvar}`);
+      this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
+
       }
 
 
