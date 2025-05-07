@@ -55,44 +55,28 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.square, this.collectsquare , null, this);
 
     this.time.addEvent({
-      delay: 4000,
-      callback: this.createTriangle,
+      delay: 500, 
+      callback: this.createRandomItem,
       callbackScope: this,
       loop: true
     });
 
-    this.time.addEvent({
-      delay: 6500,
-      callback: this.createDiamonds,
-      callbackScope: this,
-      loop: true
-    });
-
-    this.time.addEvent({
-      delay: 8500,
-      callback: this.createSquare,
-      callbackScope: this,
-      loop: true
-    });
-
-    this.trianglesvar = 0;
-    this.diamondsvar = 0;
-    this.squaresvar = 0;
+    this.itemsCollected = [];
     this.puntuationvar = 0;
 
     this.gameOver = false;
 
-    this.trianglestext = this.add.text(32, 32, `Triangulos: ${this.trianglesvar}`, {
+    this.trianglestext = this.add.text(32, 32, `Triangulos: ${this.countItems("triangle")}`, {
       fontSize: "32px",
       fill: "#000",
     });
 
-    this.diamondstext = this.add.text(32, 64, `Diamantes: ${this.diamondsvar}`, {
+    this.diamondstext = this.add.text(32, 64, `Diamantes: ${this.countItems("diamond")}`, {
       fontSize: "32px",
       fill: "#000",
     });
-
-    this.squarestext = this.add.text(32, 96, `Cuadrados: ${this.squaresvar}`, {
+    
+    this.squarestext = this.add.text(32, 96, `Cuadrados: ${this.countItems("square")}`, {
       fontSize: "32px",
       fill: "#000",
     });
@@ -111,26 +95,26 @@ export default class HelloWorldScene extends Phaser.Scene {
     });
 
     this.physics.add.collider(this.triangles, this.platforms, (triangle, platform) => {
-      triangle.touchCount += 1;
-      if (triangle.touchCount >= 2) {
-      triangle.destroy(); 
-      this.puntuationvar -= 0; 
+      triangle.points -= 5;
+      triangle.touchCount = 1;
+      if (triangle.points <= 0) {
+      triangle.destroy();  
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);}
     });
 
     this.physics.add.collider(this.diamonds, this.platforms, (diamond, platform) => {
-      diamond.touchCount += 1;
-      if (diamond.touchCount >= 2) {
+      diamond.points -= 5;
+      diamond.touchCount = 1;
+      if (diamond.points <= 0) {
       diamond.destroy(); 
-      this.puntuationvar -= 0; 
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);}
     });
 
     this.physics.add.collider(this.square, this.platforms, (square, platform) => {
-      square.touchCount += 1;
-      if (square.touchCount >= 2) {
+      square.points -= 5;
+      square.touchCount = 1;
+      if (square.points <= 0) {
       square.destroy(); 
-      this.puntuationvar -= 0; 
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);}
     });
 
@@ -144,6 +128,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     triangle.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     triangle.setCollideWorldBounds(true);
     triangle.touchCount = 0;
+    triangle.points = 10;
   }
 
   createDiamonds() {
@@ -152,6 +137,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     diamond.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     diamond.setCollideWorldBounds(true);
     diamond.touchCount = 0;
+    diamond.points = 15;
   }
 
   createSquare() {
@@ -160,6 +146,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     squares.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     squares.setCollideWorldBounds(true);
     squares.touchCount = 0;
+    squares.points = 20;
   }
 
   update() {
@@ -175,14 +162,8 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.player.setVelocityY(-520);
     }
 
-    if (
-      this.trianglesvar >= 2 &&
-      this.diamondsvar >= 2 &&
-      this.squaresvar >= 2 &&
-      this.puntuationvar >= 100 &&
-      !this.gameOver
-    ) {
-      this.Victoria();
+    if (!this.gameOver) {
+      this.checkVictoryCondition();
     }
 
     if (this.timer) {
@@ -199,42 +180,88 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   collectriangle(player, triangle) {
+  if (triangle.active) {
+    this.puntuationvar += triangle.points;
     triangle.disableBody(true, true);
-
+    this.itemsCollected.push("triangle");
     this.timer.elapsed -= 2000;
-    this.trianglesvar += 1;
-    this.puntuationvar += 10;
-    this.trianglestext.setText(`Triangulos: ${this.trianglesvar}`);
+    this.trianglestext.setText(`Triangulos: ${this.countItems("triangle")}`);
     this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
-
+    this.checkVictoryCondition();
+  }
     }
     
 
   collectdiamonds(player, diamond) {
+    if (diamond.active) {
+      this.puntuationvar += diamond.points;
       diamond.disableBody(true, true);
-  
+      this.itemsCollected.push("diamond");
       this.timer.elapsed -= 2000;
-      this.diamondsvar += 1;
-      this.puntuationvar += 15;
-      this.diamondstext.setText(`Diamantes: ${this.diamondsvar}`);
+      this.diamondstext.setText(`Diamantes: ${this.countItems("diamond")}`);
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
-
+      this.checkVictoryCondition();
+    }
       }
 
 
 
   collectsquare(player, square) {
+    if (square.active) {
+      this.puntuationvar += square.points;
       square.disableBody(true, true);
-    
+      this.itemsCollected.push("square");
       this.timer.elapsed -= 2000;
-      this.squaresvar += 1;
-      this.puntuationvar += 20;
-      this.squarestext.setText(`Cuadrados: ${this.squaresvar}`);
+      this.squarestext.setText(`Cuadrados: ${this.countItems("square")}`);
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
-
+      this.checkVictoryCondition();
+    }
       }
 
+  createRandomItem() {
+    const itemType = Phaser.Math.Between(0, 2); 
+    const x = Phaser.Math.Between(0, 2120);
+  
+    if (itemType === 0) {
+      const triangle = this.triangles.create(x, 0, "triangle");
+      triangle.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+      triangle.setCollideWorldBounds(true);
+      triangle.touchCount = 0;
+      triangle.points = 10;
+    } else if (itemType === 1) {
+      const diamond = this.diamonds.create(x, 0, "diamond");
+      diamond.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+      diamond.setCollideWorldBounds(true);
+      diamond.touchCount = 0;
+      diamond.points = 15;
+    } else {
+      const square = this.square.create(x, 0, "square");
+      square.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+      square.setCollideWorldBounds(true);
+      square.touchCount = 0;
+      square.points = 20;
+    }
+  }
 
+  countItems(type) {
+    return this.itemsCollected.filter(item => item === type).length;
+  }
+
+  checkVictoryCondition() {
+    const triangleCount = this.countItems("triangle");
+    const diamondCount = this.countItems("diamond");
+    const squareCount = this.countItems("square");
+  
+    if (
+      triangleCount >= 2 &&
+      diamondCount >= 2 &&
+      squareCount >= 2 &&
+      this.puntuationvar >= 100 &&
+      !this.gameOver
+    ) {
+      this.Victoria();
+    }
+  }
 
   Victoria() {
     this.physics.pause();
@@ -260,17 +287,17 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.puntuationtext.visible = false;
 
 
-    this.trianglestext = this.add.text(450, 750, `Triangulos: ${this.trianglesvar}`, {
+    this.trianglestext = this.add.text(450, 750, `Triangulos: ${this.countItems("triangle")}`, {
       fontSize: "32px",
       fill: "#000",
     });
 
-    this.diamondstext = this.add.text(850, 750, `Diamantes: ${this.diamondsvar}`, {
+    this.diamondstext = this.add.text(850, 750, `Diamantes: ${this.countItems("diamond")}`, {
       fontSize: "32px",
       fill: "#000",
     });
 
-    this.squarestext = this.add.text(1250, 750, `Cuadrados: ${this.squaresvar}`, {
+    this.squarestext = this.add.text(1250, 750, `Cuadrados: ${this.countItems("square")}`, {
       fontSize: "32px",
       fill: "#000",
     });
@@ -310,17 +337,17 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.puntuationtext.visible= false;
 
 
-    this.trianglestext = this.add.text(450, 750, `Triangulos: ${this.trianglesvar}`, {
+    this.trianglestext = this.add.text(450, 750, `Triangulos: ${this.countItems("triangle")}`, {
       fontSize: "32px",
       fill: "#000",
     });
 
-    this.diamondstext = this.add.text(850, 750, `Diamantes: ${this.diamondsvar}`, {
+    this.diamondstext = this.add.text(850, 750, `Diamantes: ${this.countItems("diamond")}`, {
       fontSize: "32px",
       fill: "#000",
     });
 
-    this.squarestext = this.add.text(1250, 750, `Cuadrados: ${this.squaresvar}`, {
+    this.squarestext = this.add.text(1250, 750, `Cuadrados: ${this.countItems("square")}`, {
       fontSize: "32px",
       fill: "#000",
     });
@@ -335,7 +362,8 @@ export default class HelloWorldScene extends Phaser.Scene {
       fill: "#000",
     });
   }
-  }
+
+}
 
   
 
