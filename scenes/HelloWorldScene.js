@@ -39,6 +39,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.triangles = this.physics.add.group();
     this.diamonds = this.physics.add.group();
     this.square = this.physics.add.group();
+    this.redtriangles = this.physics.add.group();
 
 
 
@@ -53,6 +54,10 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.square, this.collectsquare , null, this);
 
     this.physics.add.collider(this.player, this.square, this.collectsquare , null, this);
+
+    this.physics.add.overlap(this.player, this.redtriangles, this.touchRedTriangle, null, this);
+
+    this.physics.add.collider(this.player, this.redtriangles, this.touchRedTriangle, null, this);
 
     this.time.addEvent({
       delay: 500, 
@@ -116,6 +121,14 @@ export default class HelloWorldScene extends Phaser.Scene {
       if (square.points <= 0) {
       square.destroy(); 
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);}
+    });
+
+    this.physics.add.collider(this.redtriangles, this.platforms, (redtriangle, platform) => {
+      redtriangle.points += 5;
+      redtriangle.touchCount = 1;
+      if (redtriangle.points >= 0) {
+        redtriangle.destroy();  
+      }
     });
 
     this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -184,7 +197,6 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.puntuationvar += triangle.points;
     triangle.disableBody(true, true);
     this.itemsCollected.push("triangle");
-    this.timer.elapsed -= 2000;
     this.trianglestext.setText(`Triangulos: ${this.countItems("triangle")}`);
     this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
     this.checkVictoryCondition();
@@ -197,7 +209,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.puntuationvar += diamond.points;
       diamond.disableBody(true, true);
       this.itemsCollected.push("diamond");
-      this.timer.elapsed -= 2000;
       this.diamondstext.setText(`Diamantes: ${this.countItems("diamond")}`);
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
       this.checkVictoryCondition();
@@ -211,15 +222,22 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.puntuationvar += square.points;
       square.disableBody(true, true);
       this.itemsCollected.push("square");
-      this.timer.elapsed -= 2000;
       this.squarestext.setText(`Cuadrados: ${this.countItems("square")}`);
       this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
       this.checkVictoryCondition();
     }
       }
 
+  touchRedTriangle(player, redtriangle) {
+  if (redtriangle.active) {
+    this.puntuationvar -= 20; 
+    redtriangle.disableBody(true, true);
+    this.puntuationtext.setText(`Puntos: ${this.puntuationvar}`);
+    }
+      }
+
   createRandomItem() {
-    const itemType = Phaser.Math.Between(0, 2); 
+    const itemType = Phaser.Math.Between(0, 3); 
     const x = Phaser.Math.Between(0, 2120);
   
     if (itemType === 0) {
@@ -234,12 +252,19 @@ export default class HelloWorldScene extends Phaser.Scene {
       diamond.setCollideWorldBounds(true);
       diamond.touchCount = 0;
       diamond.points = 15;
-    } else {
+    } else if (itemType === 2) {
       const square = this.square.create(x, 0, "square");
       square.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
       square.setCollideWorldBounds(true);
       square.touchCount = 0;
       square.points = 20;
+    } else {
+      const redtriangle = this.redtriangles.create(x, 0, "triangle");
+      redtriangle.setTint(0xff0000); 
+      redtriangle.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+      redtriangle.setCollideWorldBounds(true);
+      redtriangle.touchCount = 0;
+      redtriangle.points = -20;
     }
   }
 
@@ -265,101 +290,25 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   Victoria() {
     this.physics.pause();
-
     this.gameOver = true;
-
-    this.victoriatexto = this.add.text(662, 512, `Victoria`, {
-      fontSize: "128px",
-      fill: "#000",
-    });
-
-    this.victoriatexto = this.add.text(450, 622, `Recolectaste 2 de cada figura y superaste los 100 puntos.`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
     this.time.removeAllEvents();
-
-    this.trianglestext.visible = false;
-    this.diamondstext.visible = false;
-    this.squarestext.visible = false;
-    this.timerText.visible = false;
-    this.puntuationtext.visible = false;
-
-
-    this.trianglestext = this.add.text(450, 750, `Triangulos: ${this.countItems("triangle")}`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
-    this.diamondstext = this.add.text(850, 750, `Diamantes: ${this.countItems("diamond")}`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
-    this.squarestext = this.add.text(1250, 750, `Cuadrados: ${this.countItems("square")}`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
-    this.puntuationtext = this.add.text(824, 825, `Puntuación: ${this.puntuationvar}`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
-    this.restart = this.add.text(824, 900, `Reinicie con R`, {
-      fontSize: "32px",
-      fill: "#000",
+  
+    this.scene.start("end-scene", {
+      isVictory: true,
+      itemsCollected: this.itemsCollected,
+      puntuationvar: this.puntuationvar
     });
   }
-
+  
   Derrota() {
     this.physics.pause();
-
     this.gameOver = true;
-
-    this.victoriatexto = this.add.text(662, 512, `Derrota`, {
-      fontSize: "128px",
-      fill: "#000",
-    });
-
-    this.victoriatexto = this.add.text(720, 622, `Vuelve a intentarlo.`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
     this.time.removeAllEvents();
-
-    this.trianglestext.visible = false;
-    this.diamondstext.visible = false;
-    this.squarestext.visible = false;
-    this.timerText.visible = false;
-    this.puntuationtext.visible= false;
-
-
-    this.trianglestext = this.add.text(450, 750, `Triangulos: ${this.countItems("triangle")}`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
-    this.diamondstext = this.add.text(850, 750, `Diamantes: ${this.countItems("diamond")}`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
-    this.squarestext = this.add.text(1250, 750, `Cuadrados: ${this.countItems("square")}`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
-    this.puntuationtext = this.add.text(824, 825, `Puntuación: ${this.puntuationvar}`, {
-      fontSize: "32px",
-      fill: "#000",
-    });
-
-    this.restart = this.add.text(824, 900, `Reinicie con R`, {
-      fontSize: "32px",
-      fill: "#000",
+  
+    this.scene.start("end-scene", {
+      isVictory: false,
+      itemsCollected: this.itemsCollected,
+      puntuationvar: this.puntuationvar
     });
   }
 
