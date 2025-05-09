@@ -10,7 +10,8 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("sky", "./public/assets/Cielo.webp");
+    this.load.image("sky", "./public/assets/Cielo2.png");
+    this.load.image("skyderrota", "./public/assets/Cieloperder.png");
     this.load.image("backgroundmenu", "./public/assets/FondoMenu.jpg");
     this.load.image("platform", "./public/assets/platform.png");
     this.load.image("ninjamoncho", "./public/assets/Ninja.png");
@@ -20,8 +21,11 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   create() {
-    this.sky = this.add.image(250, 165, "sky");
-    this.sky.setScale(7);
+    const worldWidth = 2020; // o this.physics.world.bounds.width si lo configuras
+    const worldHeight = 1400; // el alto que desees
+  
+    this.sky = this.add.image(0, 0, "sky").setOrigin(0);
+    this.sky.setDisplaySize(worldWidth, worldHeight);
 
     this.platforms = this.physics.add.staticGroup();
     this.platforms.create(120, 1420, "platform").setScale(12).refreshBody();
@@ -73,17 +77,23 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.trianglestext = this.add.text(32, 32, `Triangulos: ${this.countItems("triangle")}`, {
       fontSize: "32px",
-      fill: "#000",
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 4,
     });
 
     this.diamondstext = this.add.text(32, 64, `Diamantes: ${this.countItems("diamond")}`, {
       fontSize: "32px",
-      fill: "#000",
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 4,
     });
     
     this.squarestext = this.add.text(32, 96, `Cuadrados: ${this.countItems("square")}`, {
       fontSize: "32px",
-      fill: "#000",
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 4,
     });
 
 
@@ -91,12 +101,16 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.timerText = this.add.text(1780, 32, "Tiempo: 31", {
       fontSize: "32px",
-      fill: "#000",
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 4,
     });
 
     this.puntuationtext = this.add.text(32, 128, `Puntos: ${this.puntuationvar}`, {
       fontSize: "32px",
-      fill: "#000",
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 4,
     });
 
     this.physics.add.collider(this.triangles, this.platforms, (triangle, platform) => {
@@ -132,6 +146,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     });
 
     this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+    this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     
   }
 
@@ -187,8 +202,13 @@ export default class HelloWorldScene extends Phaser.Scene {
 
 
     if (this.rKey.isDown) {
-      this.scene.restart();
+      this.scene.restart();  
     }
+
+    if (this.escKey.isDown) {
+      this.scene.start("menu-scene");  
+    }
+  
 
   }
 
