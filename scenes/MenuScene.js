@@ -29,9 +29,7 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     update() {
-        // Comprobar si ENTER fue presionado
         if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
-          console.log("ENTER presionado - cambiando a hello-world");
           this.scene.start("hello-world");
         }
       }

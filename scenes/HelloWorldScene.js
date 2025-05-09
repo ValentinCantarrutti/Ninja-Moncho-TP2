@@ -21,8 +21,8 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   create() {
-    const worldWidth = 2020; // o this.physics.world.bounds.width si lo configuras
-    const worldHeight = 1400; // el alto que desees
+    const worldWidth = 2020; 
+    const worldHeight = 1400; 
   
     this.sky = this.add.image(0, 0, "sky").setOrigin(0);
     this.sky.setDisplaySize(worldWidth, worldHeight);
